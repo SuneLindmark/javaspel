@@ -1,17 +1,21 @@
-import java.awt.Canvas;
+import java.awt.*;
+import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
 public class game extends Canvas implements Runnable {
     private static final long serialVersionUID = -1890564841829395437L;
 
-    public static final int WIDTH = 640;
-    public static final int HEIGHT = WIDTH / 4 * 3;
+
     public static final String TITLE = "Mario game";
     private static game game = new game();
 
     private boolean running = false;
     private Thread thread;
+
+    static grafik g;
+    BufferStrategy bs;
+
 
     public void init(){
 
@@ -22,7 +26,24 @@ public class game extends Canvas implements Runnable {
     }
 
     public void render(){
+        bs = getBufferStrategy();
+        if (bs == null) {
+            createBufferStrategy(3);
+            return;
+        }
+        Graphics gr = bs.getDrawGraphics();
+        g.draw(gr);
+        gr.dispose();
+        bs.show();
+    }
 
+    public void draw(Graphics g){
+        drawGround(g);
+    }
+
+    public void drawGround(Graphics g){
+        g.setColor(new Color(0xfffffff));
+        g.fillRect(0,600,2000,600);
     }
 
     @Override
@@ -42,6 +63,7 @@ public class game extends Canvas implements Runnable {
             lastTime = currentTime;
 
             if(delta >= 1){
+               render();
                 ticks++;
                 delta--;
             }
@@ -50,13 +72,15 @@ public class game extends Canvas implements Runnable {
     }
 
     public static void main(String args[]){
+        g = new grafik();
+        //g.draw(g);
         JFrame frame = new JFrame(TITLE);
         frame.add(game);
-        frame.setSize(WIDTH, HEIGHT);
+        frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setFocusable(true);
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
+        //frame.setResizable(false);
         frame.setVisible(true);
         frame.pack();
         game.start();
